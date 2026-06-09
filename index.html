@@ -679,6 +679,7 @@ function startTimer() {
   timerEl.classList.add("show");
   showTime();
   timerBtn.textContent = "⏹ Stop";
+  startThinkMusic();
   timerId = setInterval(() => {
     timeLeft--;
     showTime();
@@ -687,6 +688,7 @@ function startTimer() {
 }
 function stopTimer() {
   if (timerId) { clearInterval(timerId); timerId = null; }
+  stopThinkMusic();
   timerBtn.textContent = "⏱ Start Timer";
 }
 function resetTimer() {
@@ -718,6 +720,63 @@ function playDailyDouble() {
   buzzSound(392, 0.18);
   setTimeout(() => buzzSound(523, 0.18), 180);
   setTimeout(() => buzzSound(659, 0.32), 360);
+}
+
+/* ---------- "Think!" timer music (synthesized sound-alike, no files) ----------
+   The real Jeopardy cue is copyrighted, so this is an original waltz in the
+   same spirit that loops while the clock runs. */
+let musicTimeouts = [];
+let musicPlaying = false;
+const THINK_BPM = 120;                 // jaunty game-show tempo
+const beat = 60 / THINK_BPM;           // seconds per beat
+// [frequency in Hz, length in beats]  (0 = rest)
+const THINK_MELODY = [
+  [523, 1], [523, 1], [523, 1], [659, 1],   // do do do mi
+  [523, 1], [392, 1], [523, 2],             // do so do—
+  [587, 1], [587, 1], [587, 1], [698, 1],   // re re re fa
+  [587, 1], [440, 1], [587, 2],             // re la re—
+  [523, 1], [523, 1], [523, 1], [659, 1],
+  [784, 1], [659, 1], [523, 1], [392, 1],
+  [392, 2], [523, 2],
+];
+
+function playNote(freq, start, dur) {
+  if (!freq) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = "triangle";
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(0.16, start + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(start);
+  o.stop(start + dur + 0.05);
+}
+
+function startThinkMusic() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) { return; }
+  musicPlaying = true;
+  const runLoop = () => {
+    if (!musicPlaying) return;
+    let t = audioCtx.currentTime + 0.05;
+    let total = 0;
+    THINK_MELODY.forEach(([f, beats]) => {
+      const dur = beats * beat;
+      playNote(f, t, dur * 0.9);
+      t += dur; total += dur;
+    });
+    musicTimeouts.push(setTimeout(runLoop, total * 1000));
+  };
+  runLoop();
+}
+function stopThinkMusic() {
+  musicPlaying = false;
+  musicTimeouts.forEach((id) => clearTimeout(id));
+  musicTimeouts = [];
 }
 const buzzFlash = document.getElementById("buzzFlash");
 function flashBuzz(text) {
