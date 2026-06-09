@@ -391,7 +391,9 @@
     <button id="exportBtn">⬇ Export</button>
     <button id="importBtn">⬆ Import</button>
     <button id="restoreBtn">⟲ Restore Original</button>
+    <button id="musicBtn">🎵 Timer Music</button>
     <input type="file" id="importFile" accept="application/json" style="display:none" />
+    <input type="file" id="musicFile" accept="audio/*" style="display:none" />
   </div>
 
   <div class="overlay" id="overlay">
@@ -755,6 +757,11 @@ function playNote(freq, start, dur) {
 }
 
 function startThinkMusic() {
+  // If the host loaded their own audio file, play that on loop instead.
+  if (customMusic) {
+    try { customMusic.currentTime = 0; customMusic.play(); } catch (e) {}
+    return;
+  }
   try {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === "suspended") audioCtx.resume();
@@ -777,7 +784,60 @@ function stopThinkMusic() {
   musicPlaying = false;
   musicTimeouts.forEach((id) => clearTimeout(id));
   musicTimeouts = [];
+  if (customMusic) { try { customMusic.pause(); } catch (e) {} }
 }
+
+/* ---------- Custom timer-music file (bring your own audio) ---------- */
+const MUSIC_KEY = "taylorJeopardy.music";
+let customMusic = null;        // HTMLAudioElement when a file is loaded
+const musicBtn = document.getElementById("musicBtn");
+
+function setCustomMusic(dataUrl) {
+  customMusic = new Audio(dataUrl);
+  customMusic.loop = true;
+  musicBtn.textContent = "🎵 Music: Custom ✓";
+}
+function clearCustomMusic() {
+  if (customMusic) { try { customMusic.pause(); } catch (e) {} }
+  customMusic = null;
+  try { localStorage.removeItem(MUSIC_KEY); } catch (e) {}
+  musicBtn.textContent = "🎵 Timer Music";
+}
+
+// restore a previously saved track
+(function loadSavedMusic() {
+  try {
+    const saved = localStorage.getItem(MUSIC_KEY);
+    if (saved) setCustomMusic(saved);
+  } catch (e) {}
+})();
+
+musicBtn.addEventListener("click", () => {
+  if (customMusic) {
+    if (confirm("Remove your custom timer music and go back to the built-in tune?")) clearCustomMusic();
+  } else {
+    document.getElementById("musicFile").click();
+  }
+});
+
+document.getElementById("musicFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    setCustomMusic(dataUrl);
+    // Try to remember it across reloads; large files may exceed storage.
+    try {
+      localStorage.setItem(MUSIC_KEY, dataUrl);
+      alert("Timer music loaded! 🎵 It will play during the countdown.");
+    } catch (err) {
+      alert("Timer music loaded for this session! 🎵\n(The file was too big to save permanently, so re-load it next time — or use a shorter clip.)");
+    }
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
+});
 const buzzFlash = document.getElementById("buzzFlash");
 function flashBuzz(text) {
   buzzFlash.textContent = text;

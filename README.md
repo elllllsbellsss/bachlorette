@@ -35,6 +35,10 @@ No internet, no install, nothing to set up.
   an original "thinking" waltz plays in that classic game-show spirit (the real
   Jeopardy cue is copyrighted, so this is a synthesized sound-alike — still no
   audio files, still works offline).
+- **🎵 Bring your own timer music** — click **🎵 Timer Music** to load an audio
+  file you own (any `.mp3`/`.m4a`/`.wav`). It loops during the countdown in place
+  of the built-in tune, and is remembered between sessions (short clips save
+  best). Click the button again to remove it and go back to the built-in waltz.
 - **🔔 Buzzer** — a buzz button (or press **Enter** while a clue is open) plays
   a buzzer sound and a full-screen flash. No sound files needed — it's generated
   in the browser, so it works offline.
