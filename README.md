@@ -31,11 +31,9 @@ No internet, no install, nothing to set up.
 - **⭐ Daily Doubles** — two random tiles (never on the $100 row, just like the
   show) trigger a flashing Daily Double banner and a little fanfare when opened.
 - **⏱ Timer** — a 15-second countdown you can start inside any clue; it turns
-  red and pulses in the final 5 seconds and dings when time's up. A built-in
-  15-second "think-music" countdown tune plays automatically while it runs — an
-  original game-show-style waltz baked right into the file (no downloads, works
-  offline; the real Jeopardy cue is copyrighted, so this is an original
-  sound-alike).
+  red and pulses in the final 5 seconds and dings when time's up. A royalty-free
+  "Thinking Time" countdown track plays automatically while it runs — baked right
+  into the file (no downloads, works offline).
 - **🎵 Bring your own timer music** — prefer a different track? Click
   **🎵 Timer Music** to load an audio file you own (any `.mp3`/`.m4a`/`.wav`).
   It replaces the built-in tune during the countdown and is remembered between
