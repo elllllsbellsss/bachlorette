@@ -31,14 +31,16 @@ No internet, no install, nothing to set up.
 - **⭐ Daily Doubles** — two random tiles (never on the $100 row, just like the
   show) trigger a flashing Daily Double banner and a little fanfare when opened.
 - **⏱ Timer** — a 15-second countdown you can start inside any clue; it turns
-  red and pulses in the final 5 seconds and dings when time's up. While it runs,
-  an original "thinking" waltz plays in that classic game-show spirit (the real
-  Jeopardy cue is copyrighted, so this is a synthesized sound-alike — still no
-  audio files, still works offline).
-- **🎵 Bring your own timer music** — click **🎵 Timer Music** to load an audio
-  file you own (any `.mp3`/`.m4a`/`.wav`). It loops during the countdown in place
-  of the built-in tune, and is remembered between sessions (short clips save
-  best). Click the button again to remove it and go back to the built-in waltz.
+  red and pulses in the final 5 seconds and dings when time's up. A built-in
+  15-second "think-music" countdown tune plays automatically while it runs — an
+  original game-show-style waltz baked right into the file (no downloads, works
+  offline; the real Jeopardy cue is copyrighted, so this is an original
+  sound-alike).
+- **🎵 Bring your own timer music** — prefer a different track? Click
+  **🎵 Timer Music** to load an audio file you own (any `.mp3`/`.m4a`/`.wav`).
+  It replaces the built-in tune during the countdown and is remembered between
+  sessions (short clips save best). Click the button again to remove it and go
+  back to the built-in 15-second tune.
 - **🔔 Buzzer** — a buzz button (or press **Enter** while a clue is open) plays
   a buzzer sound and a full-screen flash. No sound files needed — it's generated
   in the browser, so it works offline.
