@@ -26,10 +26,32 @@ No internet, no install, nothing to set up.
 | The Bride Tribe | "Most likely to…" group vote |
 | Us Weekly Addict | Pop-culture & nostalgia |
 
-## Customizing
+## Game-show extras
 
-All clues and answers live in the `CATEGORIES` array near the top of the
-`<script>` block in `index.html`. A few answers weren't on the original sheet,
-so they're marked **`(Host reveals!)`** — edit them in (or just keep them a
-surprise the bride/groom reveals live). Team names are editable right on the
-scoreboard — click a name to change it.
+- **⭐ Daily Doubles** — two random tiles (never on the $100 row, just like the
+  show) trigger a flashing Daily Double banner and a little fanfare when opened.
+- **⏱ Timer** — a 15-second countdown you can start inside any clue; it turns
+  red and pulses in the final 5 seconds and dings when time's up.
+- **🔔 Buzzer** — a buzz button (or press **Enter** while a clue is open) plays
+  a buzzer sound and a full-screen flash. No sound files needed — it's generated
+  in the browser, so it works offline.
+
+## Editing the game (no code required!)
+
+Click **✏️ Edit Mode** at the bottom, then click directly on:
+
+- the **game title** or subtitle,
+- any **category** heading, or
+- any **tile** (opens an editor for that clue + its answer — hit **💾 Save**).
+
+Your changes save automatically in the browser on that device. To keep them
+forever or move them to another device:
+
+- **⬇ Export** downloads your game as a `.json` file.
+- **⬆ Import** loads a `.json` file back in.
+- **⟲ Restore Original** resets everything to the questions from the PDF.
+
+A few answers weren't on the original sheet, so they're marked
+**`(Host fills in!)`** — pop into Edit Mode and fill them in, or keep them a
+surprise the bride/groom reveals live. Team names are also editable right on the
+scoreboard — just click a name.

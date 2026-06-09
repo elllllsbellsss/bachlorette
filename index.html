@@ -278,38 +278,144 @@
     font-size: 12px;
     padding: 10px 0 26px;
   }
+
+  /* ---------- Edit mode ---------- */
+  .edit-banner {
+    display: none;
+    max-width: 1180px;
+    margin: 0 auto 4px;
+    background: rgba(255,212,71,.12);
+    border: 1px dashed var(--gold-bright);
+    border-radius: 10px;
+    color: var(--gold-bright);
+    padding: 10px 16px;
+    font-size: 14px;
+    text-align: center;
+  }
+  body.edit .edit-banner { display: block; }
+  body.edit #editToggle {
+    background: var(--gold-bright);
+    color: #1a1a00;
+    border-color: var(--gold-bright);
+  }
+  body.edit [contenteditable="true"] {
+    outline: 2px dashed rgba(255,212,71,.7);
+    outline-offset: 2px;
+    cursor: text;
+  }
+  /* In edit mode, tiles show a hint and never grey out */
+  body.edit .clue-cell.done { background: linear-gradient(180deg, #0a0acb, var(--jeop-blue)); color: var(--gold-bright); }
+
+  .dd-banner {
+    display: none;
+    background: linear-gradient(90deg, #c81d6b, #ff5ca2, #c81d6b);
+    color: #fff;
+    font-family: Georgia, serif;
+    font-weight: 800;
+    font-size: clamp(20px, 3.4vw, 34px);
+    letter-spacing: 2px;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 18px;
+    text-shadow: 2px 2px 0 #000;
+    animation: ddflash 1s ease-in-out infinite alternate;
+  }
+  .dd-banner span {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    text-shadow: none;
+  }
+  .dd-banner.show { display: block; }
+  @keyframes ddflash {
+    from { box-shadow: 0 0 6px rgba(255,92,162,.5); }
+    to   { box-shadow: 0 0 28px rgba(255,92,162,.95); }
+  }
+  .clue-cell.dd-tile { } /* daily double hidden until opened — looks identical */
+
+  .timer {
+    display: none;
+    font-family: "Courier New", monospace;
+    font-size: clamp(34px, 7vw, 64px);
+    font-weight: 800;
+    color: var(--gold-bright);
+    text-shadow: 2px 2px 0 #000;
+    margin: 4px 0 10px;
+    letter-spacing: 2px;
+  }
+  .timer.show { display: block; }
+  .timer.low { color: #ff6b6b; animation: pulse .5s ease-in-out infinite alternate; }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+
+  button.buzz { background: #ff3b3b; color: #fff; }
+  button.timer-btn { background: #2bb673; color: #fff; }
+  button.save { background: var(--gold-bright); color: #1a1a00; display: none; }
+  body.edit button.save { display: inline-block; }
+  body.edit button.buzz,
+  body.edit button.timer-btn,
+  body.edit button.reveal { display: none; }
+
+  /* full-screen buzz flash */
+  .buzz-flash {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(255,59,59,.45);
+    display: none; align-items: center; justify-content: center;
+    font-family: Georgia, serif; font-weight: 800;
+    font-size: clamp(40px, 12vw, 140px); color: #fff;
+    text-shadow: 4px 4px 0 #000;
+    pointer-events: none;
+  }
+  .buzz-flash.show { display: flex; animation: pop .25s ease; }
 </style>
 </head>
 <body>
 
   <header>
-    <h1>♥ Taylor's Bachelorette Jeopardy ♥</h1>
-    <div class="subtitle">How well do you <em>really</em> know the bride &amp; groom?</div>
+    <h1 id="gameTitle">♥ Taylor's Bachelorette Jeopardy ♥</h1>
+    <div class="subtitle" id="gameSubtitle">How well do you <em>really</em> know the bride &amp; groom?</div>
   </header>
+
+  <div class="edit-banner" id="editBanner">
+    ✏️ <strong>Edit Mode is ON.</strong> Click the title, any category, or any tile to change its text. Changes save automatically on this device — use <em>Export</em> to keep them forever.
+  </div>
 
   <div class="board" id="board"></div>
 
   <div class="scoreboard" id="scoreboard"></div>
   <div class="controls">
+    <button id="editToggle">✏️ Edit Mode</button>
     <button id="addTeam">+ Add Team</button>
     <button id="resetGame">↺ Reset Board</button>
+    <button id="exportBtn">⬇ Export</button>
+    <button id="importBtn">⬆ Import</button>
+    <button id="restoreBtn">⟲ Restore Original</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none" />
   </div>
 
   <div class="overlay" id="overlay">
     <div class="modal">
+      <div class="dd-banner" id="ddBanner">⭐ DAILY DOUBLE! ⭐<span>Wager your points before you see the clue</span></div>
       <span class="pill" id="modalCat"></span>
       <div class="value" id="modalValue"></div>
+      <div class="timer" id="timer"></div>
       <div class="clue-text" id="modalClue"></div>
       <div class="answer-text" id="modalAnswer">
-        <span class="label">Correct Response</span>
+        <span class="label" id="answerLabel">Correct Response</span>
         <span id="answerContent"></span>
       </div>
       <div class="btn-row">
+        <button class="action buzz" id="buzzBtn">🔔 Buzz!</button>
+        <button class="action timer-btn" id="timerBtn">⏱ Start Timer</button>
         <button class="action reveal" id="revealBtn">Reveal Response</button>
+        <button class="action save" id="saveBtn">💾 Save</button>
         <button class="action close" id="closeBtn">Close</button>
       </div>
     </div>
   </div>
+
+  <div class="buzz-flash" id="buzzFlash">🔔 BUZZ!</div>
 
   <footer>Made with ♥ for Taylor &amp; Alex &nbsp;·&nbsp; Tap a tile to play</footer>
 
@@ -318,7 +424,7 @@
    GAME DATA  —  edit answers here! Anything marked "(Host reveals!)" wasn't
    on the original sheet, so the bride/groom can fill it in live.
    ========================================================================= */
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   {
     title: "How Well Do You Know The Bride?",
     clues: [
@@ -381,6 +487,62 @@ const CATEGORIES = [
   },
 ];
 
+const DEFAULT_TITLE = "♥ Taylor's Bachelorette Jeopardy ♥";
+const DEFAULT_SUBTITLE = "How well do you <em>really</em> know the bride &amp; groom?";
+
+/* ---------- Persistence ---------- */
+const STORE_KEY = "taylorJeopardy.v1";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      title: gameTitle.innerHTML,
+      subtitle: gameSubtitle.innerHTML,
+      categories: CATEGORIES,
+      dailyDoubles: [...dailyDoubles],
+    }));
+  } catch (e) {}
+}
+
+const gameTitle = document.getElementById("gameTitle");
+const gameSubtitle = document.getElementById("gameSubtitle");
+
+// Daily Doubles are stored as "col-row" strings
+let dailyDoubles = new Set();
+let CATEGORIES;
+
+(function initData() {
+  const saved = loadState();
+  if (saved && saved.categories) {
+    CATEGORIES = saved.categories;
+    if (saved.title) gameTitle.innerHTML = saved.title;
+    if (saved.subtitle) gameSubtitle.innerHTML = saved.subtitle;
+    dailyDoubles = new Set(saved.dailyDoubles || []);
+  } else {
+    CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    randomizeDailyDoubles();
+  }
+})();
+
+// Pick 2 random tiles to be Daily Doubles (classic Jeopardy has ~2 per board)
+function randomizeDailyDoubles() {
+  dailyDoubles = new Set();
+  const picks = new Set();
+  while (picks.size < 2) {
+    const col = Math.floor(Math.random() * 6);
+    const row = 1 + Math.floor(Math.random() * 4); // not the $100 row, like the show
+    picks.add(col + "-" + row);
+  }
+  dailyDoubles = picks;
+}
+
 const VALUES = [100, 200, 300, 400, 500];
 
 /* ---------- Build board ---------- */
@@ -388,10 +550,16 @@ const board = document.getElementById("board");
 function buildBoard() {
   board.innerHTML = "";
   // category header row
-  CATEGORIES.forEach((cat) => {
+  CATEGORIES.forEach((cat, colIdx) => {
     const c = document.createElement("div");
     c.className = "cat-cell";
     c.textContent = cat.title;
+    c.dataset.col = colIdx;
+    c.addEventListener("blur", () => {
+      if (!editMode) return;
+      CATEGORIES[colIdx].title = c.textContent.trim();
+      saveState();
+    });
     board.appendChild(c);
   });
   // clue rows
@@ -402,10 +570,12 @@ function buildBoard() {
       cell.textContent = "$" + val;
       cell.dataset.col = colIdx;
       cell.dataset.row = rowIdx;
+      if (dailyDoubles.has(colIdx + "-" + rowIdx)) cell.classList.add("dd-tile");
       cell.addEventListener("click", () => openClue(colIdx, rowIdx, val, cell));
       board.appendChild(cell);
     });
   });
+  applyEditMode();
 }
 
 /* ---------- Modal logic ---------- */
@@ -415,19 +585,45 @@ const modalValue = document.getElementById("modalValue");
 const modalClue = document.getElementById("modalClue");
 const modalAnswer = document.getElementById("modalAnswer");
 const answerContent = document.getElementById("answerContent");
+const answerLabel = document.getElementById("answerLabel");
 const revealBtn = document.getElementById("revealBtn");
+const saveBtn = document.getElementById("saveBtn");
+const ddBanner = document.getElementById("ddBanner");
 let activeCell = null;
+let activeCol = null, activeRow = null;
 
 function openClue(col, row, val, cell) {
-  if (cell.classList.contains("done")) return;
+  // In play mode, skip already-used tiles. In edit mode, always open.
+  if (!editMode && cell.classList.contains("done")) return;
   activeCell = cell;
+  activeCol = col; activeRow = row;
   const cat = CATEGORIES[col];
+
   modalCat.textContent = cat.title;
   modalValue.textContent = "$" + val;
   modalClue.textContent = cat.clues[row].q;
   answerContent.textContent = cat.clues[row].a;
   modalAnswer.classList.remove("show");
   revealBtn.textContent = "Reveal Response";
+
+  // Daily Double — only surfaces in play mode
+  const isDD = !editMode && dailyDoubles.has(col + "-" + row);
+  ddBanner.classList.toggle("show", isDD);
+  if (isDD) playDailyDouble();
+
+  // Edit mode: make the clue + answer directly editable, answer always visible
+  if (editMode) {
+    modalClue.setAttribute("contenteditable", "true");
+    answerContent.setAttribute("contenteditable", "true");
+    modalAnswer.classList.add("show");
+    answerLabel.textContent = "Correct Response (editable)";
+  } else {
+    modalClue.removeAttribute("contenteditable");
+    answerContent.removeAttribute("contenteditable");
+    answerLabel.textContent = "Correct Response";
+  }
+
+  resetTimer();
   overlay.classList.add("show");
 }
 
@@ -441,19 +637,99 @@ revealBtn.addEventListener("click", () => {
   }
 });
 
+saveBtn.addEventListener("click", () => {
+  if (activeCol === null) return;
+  CATEGORIES[activeCol].clues[activeRow].q = modalClue.textContent.trim();
+  CATEGORIES[activeCol].clues[activeRow].a = answerContent.textContent.trim();
+  saveState();
+  saveBtn.textContent = "✓ Saved!";
+  setTimeout(() => { saveBtn.textContent = "💾 Save"; closeModal(); }, 650);
+});
+
 function closeModal() {
   overlay.classList.remove("show");
-  if (activeCell) {
-    activeCell.classList.add("done");
-    activeCell = null;
-  }
+  ddBanner.classList.remove("show");
+  stopTimer();
+  // Only grey out tiles during actual play, not while editing
+  if (activeCell && !editMode) activeCell.classList.add("done");
+  activeCell = null; activeCol = null; activeRow = null;
 }
 document.getElementById("closeBtn").addEventListener("click", closeModal);
-overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+overlay.addEventListener("click", (e) => { if (e.target === overlay && !editMode) closeModal(); });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeModal();
-  if (e.key === " " && overlay.classList.contains("show")) { e.preventDefault(); revealBtn.click(); }
+  if (!overlay.classList.contains("show") || editMode) return;
+  if (e.key === " ") { e.preventDefault(); revealBtn.click(); }
+  if (e.key === "Enter") { e.preventDefault(); buzz(); }
 });
+
+/* ---------- Timer ---------- */
+const timerEl = document.getElementById("timer");
+const timerBtn = document.getElementById("timerBtn");
+let timerId = null, timeLeft = 0;
+const TIMER_SECONDS = 15;
+
+function showTime() {
+  timerEl.textContent = "0:" + String(timeLeft).padStart(2, "0");
+  timerEl.classList.toggle("low", timeLeft <= 5);
+}
+function startTimer() {
+  stopTimer();
+  timeLeft = TIMER_SECONDS;
+  timerEl.classList.add("show");
+  showTime();
+  timerBtn.textContent = "⏹ Stop";
+  timerId = setInterval(() => {
+    timeLeft--;
+    showTime();
+    if (timeLeft <= 0) { stopTimer(); buzzSound(440, 0.5); flashBuzz("⏰ TIME!"); }
+  }, 1000);
+}
+function stopTimer() {
+  if (timerId) { clearInterval(timerId); timerId = null; }
+  timerBtn.textContent = "⏱ Start Timer";
+}
+function resetTimer() {
+  stopTimer();
+  timerEl.classList.remove("show", "low");
+}
+timerBtn.addEventListener("click", () => {
+  if (timerId) stopTimer(); else startTimer();
+});
+
+/* ---------- Buzzer (Web Audio — no files needed) ---------- */
+let audioCtx = null;
+function buzzSound(freq = 320, dur = 0.35) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "square";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+function playDailyDouble() {
+  // little rising fanfare
+  buzzSound(392, 0.18);
+  setTimeout(() => buzzSound(523, 0.18), 180);
+  setTimeout(() => buzzSound(659, 0.32), 360);
+}
+const buzzFlash = document.getElementById("buzzFlash");
+function flashBuzz(text) {
+  buzzFlash.textContent = text;
+  buzzFlash.classList.add("show");
+  setTimeout(() => buzzFlash.classList.remove("show"), 700);
+}
+function buzz() {
+  buzzSound(300, 0.4);
+  flashBuzz("🔔 BUZZ!");
+}
+document.getElementById("buzzBtn").addEventListener("click", buzz);
 
 /* ---------- Scoreboard ---------- */
 let teams = [
@@ -503,6 +779,81 @@ document.getElementById("resetGame").addEventListener("click", () => {
   teams.forEach((t) => (t.score = 0));
   document.querySelectorAll(".clue-cell.done").forEach((c) => c.classList.remove("done"));
   renderScores();
+});
+
+/* ---------- Edit mode ---------- */
+let editMode = false;
+
+function applyEditMode() {
+  document.body.classList.toggle("edit", editMode);
+  // Title, subtitle, and category cells become editable
+  [gameTitle, gameSubtitle].forEach((el) =>
+    el.setAttribute("contenteditable", editMode ? "true" : "false"));
+  document.querySelectorAll(".cat-cell").forEach((c) =>
+    c.setAttribute("contenteditable", editMode ? "true" : "false"));
+}
+
+gameTitle.addEventListener("blur", () => { if (editMode) saveState(); });
+gameSubtitle.addEventListener("blur", () => { if (editMode) saveState(); });
+
+document.getElementById("editToggle").addEventListener("click", () => {
+  editMode = !editMode;
+  applyEditMode();
+  if (!editMode) saveState();
+});
+
+/* ---------- Export / Import / Restore ---------- */
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const data = {
+    title: gameTitle.innerHTML,
+    subtitle: gameSubtitle.innerHTML,
+    categories: CATEGORIES,
+    dailyDoubles: [...dailyDoubles],
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "taylor-jeopardy-game.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importBtn").addEventListener("click", () =>
+  document.getElementById("importFile").click());
+
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data.categories) throw new Error("bad file");
+      CATEGORIES = data.categories;
+      if (data.title) gameTitle.innerHTML = data.title;
+      if (data.subtitle) gameSubtitle.innerHTML = data.subtitle;
+      dailyDoubles = new Set(data.dailyDoubles || []);
+      saveState();
+      buildBoard();
+      alert("Game loaded! 🎉");
+    } catch (err) {
+      alert("Sorry, that file couldn't be read.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+document.getElementById("restoreBtn").addEventListener("click", () => {
+  if (!confirm("Restore the original questions & answers? This erases your edits.")) return;
+  localStorage.removeItem(STORE_KEY);
+  CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  gameTitle.innerHTML = DEFAULT_TITLE;
+  gameSubtitle.innerHTML = DEFAULT_SUBTITLE;
+  randomizeDailyDoubles();
+  saveState();
+  buildBoard();
 });
 
 /* ---------- Init ---------- */
