@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taylor's Bachelorette Jeopardy</title>
+<style>
+  :root {
+    --jeop-blue: #060ce9;
+    --jeop-dark: #0b0b6b;
+    --jeop-board: #0a0a52;
+    --gold: #d4a017;
+    --gold-bright: #ffd447;
+    --pink: #ff5ca2;
+    --pink-soft: #ffd1e6;
+    --text: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at top, #1b1bb0 0%, #05053a 70%);
+    color: var(--text);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    text-align: center;
+    padding: 18px 12px 8px;
+  }
+  header h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(28px, 5vw, 56px);
+    letter-spacing: 2px;
+    color: var(--gold-bright);
+    text-shadow: 3px 3px 0 #000, 0 0 18px rgba(255,212,71,.4);
+  }
+  header .subtitle {
+    margin-top: 6px;
+    font-size: clamp(13px, 2.4vw, 20px);
+    color: var(--pink-soft);
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    max-width: 1200px;
+    margin: 16px auto;
+    padding: 0 10px;
+  }
+
+  .cat-cell {
+    background: linear-gradient(180deg, #1717c4, var(--jeop-blue));
+    border: 2px solid #000;
+    border-radius: 6px;
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 6px;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(11px, 1.3vw, 16px);
+    text-transform: uppercase;
+    color: var(--gold-bright);
+    text-shadow: 2px 2px 0 #000;
+    line-height: 1.2;
+  }
+
+  .clue-cell {
+    background: linear-gradient(180deg, #0a0acb, var(--jeop-blue));
+    border: 2px solid #000;
+    border-radius: 6px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    font-weight: 800;
+    font-size: clamp(20px, 3.2vw, 40px);
+    color: var(--gold-bright);
+    text-shadow: 2px 2px 0 #000, 0 0 12px rgba(0,0,0,.5);
+    cursor: pointer;
+    transition: transform .08s ease, box-shadow .15s ease, background .2s;
+    user-select: none;
+  }
+  .clue-cell:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 18px rgba(255,212,71,.55);
+    background: linear-gradient(180deg, #1d1dff, #1414e6);
+  }
+  .clue-cell.done {
+    background: #05052e;
+    color: transparent;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+  }
+  .clue-cell.done:hover { transform: none; box-shadow: none; }
+
+  /* ---------- Modal ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 16px;
+  }
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: linear-gradient(180deg, #0d0dd6, var(--jeop-blue));
+    border: 4px solid var(--gold);
+    border-radius: 14px;
+    max-width: 880px;
+    width: 100%;
+    padding: 40px 34px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(0,0,0,.7);
+    position: relative;
+  }
+  .modal .pill {
+    display: inline-block;
+    background: var(--pink);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 16px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .modal .value {
+    color: var(--gold-bright);
+    font-family: Georgia, serif;
+    font-weight: 800;
+    font-size: 30px;
+    margin-bottom: 14px;
+    text-shadow: 2px 2px 0 #000;
+  }
+  .modal .clue-text {
+    font-family: Georgia, serif;
+    font-size: clamp(22px, 3.6vw, 36px);
+    line-height: 1.35;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+    min-height: 70px;
+  }
+  .modal .answer-text {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 2px dashed rgba(255,255,255,.35);
+    color: var(--gold-bright);
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 3.2vw, 32px);
+    font-weight: 800;
+    display: none;
+    animation: pop .25s ease;
+  }
+  .modal .answer-text.show { display: block; }
+  .modal .answer-text .label {
+    display: block;
+    font-size: 14px;
+    color: var(--pink-soft);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  @keyframes pop {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .btn-row {
+    margin-top: 30px;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button.action {
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 28px;
+    cursor: pointer;
+    letter-spacing: .5px;
+    transition: transform .08s, filter .15s;
+  }
+  button.action:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  button.reveal { background: var(--gold-bright); color: #1a1a00; }
+  button.close  { background: #ff5ca2; color: #fff; }
+
+  /* ---------- Scoreboard ---------- */
+  .scoreboard {
+    max-width: 1200px;
+    margin: 8px auto 40px;
+    padding: 0 10px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .team {
+    background: rgba(255,255,255,.06);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 12px 16px;
+    min-width: 160px;
+    text-align: center;
+  }
+  .team .name {
+    font-weight: 700;
+    color: var(--pink-soft);
+    margin-bottom: 6px;
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+  .team .score {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--gold-bright);
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 8px;
+  }
+  .team .score.neg { color: #ff8a8a; }
+  .team-btns { display: flex; gap: 6px; justify-content: center; }
+  .team-btns button {
+    border: none;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .team-btns .plus { background: var(--gold-bright); color: #1a1a00; }
+  .team-btns .minus { background: #ff5ca2; color: #fff; }
+
+  .controls {
+    text-align: center;
+    margin: 4px auto 30px;
+  }
+  .controls button {
+    background: transparent;
+    color: var(--pink-soft);
+    border: 1px solid var(--pink);
+    border-radius: 999px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin: 0 4px;
+  }
+  .controls button:hover { background: rgba(255,92,162,.2); }
+
+  footer {
+    text-align: center;
+    color: rgba(255,255,255,.4);
+    font-size: 12px;
+    padding: 10px 0 26px;
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>♥ Taylor's Bachelorette Jeopardy ♥</h1>
+    <div class="subtitle">How well do you <em>really</em> know the bride &amp; groom?</div>
+  </header>
+
+  <div class="board" id="board"></div>
+
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="controls">
+    <button id="addTeam">+ Add Team</button>
+    <button id="resetGame">↺ Reset Board</button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <span class="pill" id="modalCat"></span>
+      <div class="value" id="modalValue"></div>
+      <div class="clue-text" id="modalClue"></div>
+      <div class="answer-text" id="modalAnswer">
+        <span class="label">Answer</span>
+        <span id="answerContent"></span>
+      </div>
+      <div class="btn-row">
+        <button class="action reveal" id="revealBtn">Reveal Answer</button>
+        <button class="action close" id="closeBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with ♥ for Taylor &amp; Alex &nbsp;·&nbsp; Tap a tile to play</footer>
+
+<script>
+/* =========================================================================
+   GAME DATA  —  edit answers here! Anything marked "(Host reveals!)" wasn't
+   on the original sheet, so the bride/groom can fill it in live.
+   ========================================================================= */
+const CATEGORIES = [
+  {
+    title: "How Well Do You Know The Bride?",
+    clues: [
+      { q: "This is Taylor's favorite activity of all time.", a: "Puzzlin'" },
+      { q: "This unglamorous gig was Taylor's first job.", a: "Lunds grocery bagger" },
+      { q: "Growing up, this was Taylor's best friend and most loyal companion.", a: "Her dog, Krammer" },
+      { q: "Often kept a secret, this is the first place the bride lived after moving to Los Angeles.", a: "(Host reveals!)" },
+      { q: "This band and their famous one-hit-wonder has topped the charts of her Spotify ever since.", a: "Spoon" },
+    ],
+  },
+  {
+    title: "A Brief History Of The Happy Couple",
+    clues: [
+      { q: "This is where Taylor and Alex first met.", a: "(Host reveals!)" },
+      { q: "This was Taylor and Alex's first date location.", a: "(Host reveals!)" },
+      { q: "This was Taylor and Alex's first trip together.", a: "(Host reveals!)" },
+      { q: "This is who said “I love you” first.", a: "(Host reveals!)" },
+      { q: "This is the biggest relationship challenge Taylor and Alex have had to overcome.", a: "When Alex had to help Taylor while she pooped after breaking her hip… and then again after breaking her leg." },
+    ],
+  },
+  {
+    title: "To Know Alex Is To Love Him",
+    clues: [
+      { q: "This is Alex's movie theater concession order.", a: "(Host reveals!)" },
+      { q: "This is Alex's guilty pleasure.", a: "(Host reveals!)" },
+      { q: "This is Alex's favorite movie.", a: "(Host reveals!)" },
+      { q: "This is Alex's most used phrase.", a: "(Host reveals!)" },
+      { q: "This is Alex's favorite thing about Taylor.", a: "(Host reveals!)" },
+    ],
+  },
+  {
+    title: "She's Beauty, She's Grace, She's Full Of Toilet Humor",
+    clues: [
+      { q: "Taylor used this artifact to prank KK frat boys.", a: "A vagina" },
+      { q: "This was Taylor's favorite prank to play in the hallway of her college apartment building.", a: "Giant poopy underwear" },
+      { q: "This is what Taylor often shapes her lips to look like.", a: "A vagina" },
+      { q: "This is Taylor's go-to prank call spiel.", a: "“Hello! We found 8 baby toes in your beefer.”" },
+      { q: "This is Taylor's funniest nickname.", a: "(Host reveals!)" },
+    ],
+  },
+  {
+    title: "The Bride Tribe",
+    clues: [
+      { q: "This bachelorette guest is most likely to ensure Taylor gets home.", a: "(Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to convince the group that one more drink is a good idea.", a: "(Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to make friends with strangers at the bar.", a: "(Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to be the first one on the dance floor.", a: "(Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to disappear for 30 minutes and return with a wild story.", a: "(Vote as a group!)" },
+    ],
+  },
+  {
+    title: "Us Weekly Addict",
+    clues: [
+      { q: "This is Taylor's celebrity doppelganger.", a: "Cameron Diaz" },
+      { q: "This is Taylor's childhood muse.", a: "The Olsen Twins" },
+      { q: "This song was Taylor's middle school anthem.", a: "“Bubbly” by Colbie Caillat" },
+      { q: "This is Taylor's celebrity crush.", a: "(Host reveals!)" },
+      { q: "This is the reality TV show Taylor could binge forever.", a: "(Host reveals!)" },
+    ],
+  },
+];
+
+const VALUES = [100, 200, 300, 400, 500];
+
+/* ---------- Build board ---------- */
+const board = document.getElementById("board");
+function buildBoard() {
+  board.innerHTML = "";
+  // category header row
+  CATEGORIES.forEach((cat) => {
+    const c = document.createElement("div");
+    c.className = "cat-cell";
+    c.textContent = cat.title;
+    board.appendChild(c);
+  });
+  // clue rows
+  VALUES.forEach((val, rowIdx) => {
+    CATEGORIES.forEach((cat, colIdx) => {
+      const cell = document.createElement("div");
+      cell.className = "clue-cell";
+      cell.textContent = "$" + val;
+      cell.dataset.col = colIdx;
+      cell.dataset.row = rowIdx;
+      cell.addEventListener("click", () => openClue(colIdx, rowIdx, val, cell));
+      board.appendChild(cell);
+    });
+  });
+}
+
+/* ---------- Modal logic ---------- */
+const overlay = document.getElementById("overlay");
+const modalCat = document.getElementById("modalCat");
+const modalValue = document.getElementById("modalValue");
+const modalClue = document.getElementById("modalClue");
+const modalAnswer = document.getElementById("modalAnswer");
+const answerContent = document.getElementById("answerContent");
+const revealBtn = document.getElementById("revealBtn");
+let activeCell = null;
+
+function openClue(col, row, val, cell) {
+  if (cell.classList.contains("done")) return;
+  activeCell = cell;
+  const cat = CATEGORIES[col];
+  modalCat.textContent = cat.title;
+  modalValue.textContent = "$" + val;
+  modalClue.textContent = cat.clues[row].q;
+  answerContent.textContent = cat.clues[row].a;
+  modalAnswer.classList.remove("show");
+  revealBtn.textContent = "Reveal Answer";
+  overlay.classList.add("show");
+}
+
+revealBtn.addEventListener("click", () => {
+  if (modalAnswer.classList.contains("show")) {
+    modalAnswer.classList.remove("show");
+    revealBtn.textContent = "Reveal Answer";
+  } else {
+    modalAnswer.classList.add("show");
+    revealBtn.textContent = "Hide Answer";
+  }
+});
+
+function closeModal() {
+  overlay.classList.remove("show");
+  if (activeCell) {
+    activeCell.classList.add("done");
+    activeCell = null;
+  }
+}
+document.getElementById("closeBtn").addEventListener("click", closeModal);
+overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+  if (e.key === " " && overlay.classList.contains("show")) { e.preventDefault(); revealBtn.click(); }
+});
+
+/* ---------- Scoreboard ---------- */
+let teams = [
+  { name: "Team Bride", score: 0 },
+  { name: "Team Groom", score: 0 },
+];
+const scoreboard = document.getElementById("scoreboard");
+
+function renderScores() {
+  scoreboard.innerHTML = "";
+  teams.forEach((t, i) => {
+    const div = document.createElement("div");
+    div.className = "team";
+    div.innerHTML = `
+      <div class="name" contenteditable="true" data-i="${i}">${t.name}</div>
+      <div class="score ${t.score < 0 ? "neg" : ""}">$${t.score}</div>
+      <div class="team-btns">
+        <button class="minus" data-i="${i}">−</button>
+        <button class="plus" data-i="${i}">+</button>
+      </div>`;
+    scoreboard.appendChild(div);
+  });
+  scoreboard.querySelectorAll(".plus").forEach((b) =>
+    b.addEventListener("click", () => adjust(+b.dataset.i, +1)));
+  scoreboard.querySelectorAll(".minus").forEach((b) =>
+    b.addEventListener("click", () => adjust(+b.dataset.i, -1)));
+  scoreboard.querySelectorAll(".name").forEach((n) =>
+    n.addEventListener("blur", () => { teams[+n.dataset.i].name = n.textContent.trim() || "Team"; }));
+}
+
+// adjust by the current clue value if a clue is open, else by 100
+function adjust(i, sign) {
+  let amount = 100;
+  if (overlay.classList.contains("show")) {
+    amount = parseInt(modalValue.textContent.replace("$", ""), 10) || 100;
+  }
+  teams[i].score += sign * amount;
+  renderScores();
+}
+
+document.getElementById("addTeam").addEventListener("click", () => {
+  teams.push({ name: "Team " + (teams.length + 1), score: 0 });
+  renderScores();
+});
+document.getElementById("resetGame").addEventListener("click", () => {
+  if (!confirm("Reset the board and all scores?")) return;
+  teams.forEach((t) => (t.score = 0));
+  document.querySelectorAll(".clue-cell.done").forEach((c) => c.classList.remove("done"));
+  renderScores();
+});
+
+/* ---------- Init ---------- */
+buildBoard();
+renderScores();
+</script>
+</body>
+</html>
