@@ -301,11 +301,11 @@
       <div class="value" id="modalValue"></div>
       <div class="clue-text" id="modalClue"></div>
       <div class="answer-text" id="modalAnswer">
-        <span class="label">Answer</span>
+        <span class="label">Correct Response</span>
         <span id="answerContent"></span>
       </div>
       <div class="btn-row">
-        <button class="action reveal" id="revealBtn">Reveal Answer</button>
+        <button class="action reveal" id="revealBtn">Reveal Response</button>
         <button class="action close" id="closeBtn">Close</button>
       </div>
     </div>
@@ -322,61 +322,61 @@ const CATEGORIES = [
   {
     title: "How Well Do You Know The Bride?",
     clues: [
-      { q: "This is Taylor's favorite activity of all time.", a: "Puzzlin'" },
-      { q: "This unglamorous gig was Taylor's first job.", a: "Lunds grocery bagger" },
-      { q: "Growing up, this was Taylor's best friend and most loyal companion.", a: "Her dog, Krammer" },
-      { q: "Often kept a secret, this is the first place the bride lived after moving to Los Angeles.", a: "(Host reveals!)" },
-      { q: "This band and their famous one-hit-wonder has topped the charts of her Spotify ever since.", a: "Spoon" },
+      { q: "This is Taylor's favorite activity of all time.", a: "What is puzzlin'?" },
+      { q: "This unglamorous gig was Taylor's first job.", a: "What is bagging groceries at Lunds?" },
+      { q: "Growing up, this was Taylor's best friend and most loyal companion.", a: "Who is her dog, Krammer?" },
+      { q: "Often kept a secret, this is the first place the bride lived after moving to Los Angeles.", a: "What is ___? (Host fills in!)" },
+      { q: "This band and their famous one-hit-wonder has topped the charts of her Spotify ever since.", a: "Who is Spoon?" },
     ],
   },
   {
     title: "A Brief History Of The Happy Couple",
     clues: [
-      { q: "This is where Taylor and Alex first met.", a: "(Host reveals!)" },
-      { q: "This was Taylor and Alex's first date location.", a: "(Host reveals!)" },
-      { q: "This was Taylor and Alex's first trip together.", a: "(Host reveals!)" },
-      { q: "This is who said “I love you” first.", a: "(Host reveals!)" },
-      { q: "This is the biggest relationship challenge Taylor and Alex have had to overcome.", a: "When Alex had to help Taylor while she pooped after breaking her hip… and then again after breaking her leg." },
+      { q: "This is where Taylor and Alex first met.", a: "What is ___? (Host fills in!)" },
+      { q: "This was Taylor and Alex's first date location.", a: "What is ___? (Host fills in!)" },
+      { q: "This was Taylor and Alex's first trip together.", a: "What is ___? (Host fills in!)" },
+      { q: "This is who said “I love you” first.", a: "Who is ___? (Host fills in!)" },
+      { q: "This is the biggest relationship challenge Taylor and Alex have had to overcome.", a: "What is when Alex had to help Taylor poop after she broke her hip… and then again after she broke her leg?" },
     ],
   },
   {
     title: "To Know Alex Is To Love Him",
     clues: [
-      { q: "This is Alex's movie theater concession order.", a: "(Host reveals!)" },
-      { q: "This is Alex's guilty pleasure.", a: "(Host reveals!)" },
-      { q: "This is Alex's favorite movie.", a: "(Host reveals!)" },
-      { q: "This is Alex's most used phrase.", a: "(Host reveals!)" },
-      { q: "This is Alex's favorite thing about Taylor.", a: "(Host reveals!)" },
+      { q: "This is Alex's movie theater concession order.", a: "What is ___? (Host fills in!)" },
+      { q: "This is Alex's guilty pleasure.", a: "What is ___? (Host fills in!)" },
+      { q: "This is Alex's favorite movie.", a: "What is ___? (Host fills in!)" },
+      { q: "This is Alex's most used phrase.", a: "What is ___? (Host fills in!)" },
+      { q: "This is Alex's favorite thing about Taylor.", a: "What is ___? (Host fills in!)" },
     ],
   },
   {
     title: "She's Beauty, She's Grace, She's Full Of Toilet Humor",
     clues: [
-      { q: "Taylor used this artifact to prank KK frat boys.", a: "A vagina" },
-      { q: "This was Taylor's favorite prank to play in the hallway of her college apartment building.", a: "Giant poopy underwear" },
-      { q: "This is what Taylor often shapes her lips to look like.", a: "A vagina" },
-      { q: "This is Taylor's go-to prank call spiel.", a: "“Hello! We found 8 baby toes in your beefer.”" },
-      { q: "This is Taylor's funniest nickname.", a: "(Host reveals!)" },
+      { q: "Taylor used this artifact to prank KK frat boys.", a: "What is a (fake) vagina?" },
+      { q: "This was Taylor's favorite prank to play in the hallway of her college apartment building.", a: "What is giant poopy underwear?" },
+      { q: "This is what Taylor often shapes her lips to look like.", a: "What is a vagina?" },
+      { q: "This is Taylor's go-to prank call spiel.", a: "What is “Hello! We found 8 baby toes in your beefer”?" },
+      { q: "This is Taylor's funniest nickname.", a: "What is ___? (Host fills in!)" },
     ],
   },
   {
     title: "The Bride Tribe",
     clues: [
-      { q: "This bachelorette guest is most likely to ensure Taylor gets home.", a: "(Vote as a group!)" },
-      { q: "This bachelorette guest is most likely to convince the group that one more drink is a good idea.", a: "(Vote as a group!)" },
-      { q: "This bachelorette guest is most likely to make friends with strangers at the bar.", a: "(Vote as a group!)" },
-      { q: "This bachelorette guest is most likely to be the first one on the dance floor.", a: "(Vote as a group!)" },
-      { q: "This bachelorette guest is most likely to disappear for 30 minutes and return with a wild story.", a: "(Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to ensure Taylor gets home.", a: "Who is ___? (Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to convince the group that one more drink is a good idea.", a: "Who is ___? (Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to make friends with strangers at the bar.", a: "Who is ___? (Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to be the first one on the dance floor.", a: "Who is ___? (Vote as a group!)" },
+      { q: "This bachelorette guest is most likely to disappear for 30 minutes and return with a wild story.", a: "Who is ___? (Vote as a group!)" },
     ],
   },
   {
     title: "Us Weekly Addict",
     clues: [
-      { q: "This is Taylor's celebrity doppelganger.", a: "Cameron Diaz" },
-      { q: "This is Taylor's childhood muse.", a: "The Olsen Twins" },
-      { q: "This song was Taylor's middle school anthem.", a: "“Bubbly” by Colbie Caillat" },
-      { q: "This is Taylor's celebrity crush.", a: "(Host reveals!)" },
-      { q: "This is the reality TV show Taylor could binge forever.", a: "(Host reveals!)" },
+      { q: "This is Taylor's celebrity doppelganger.", a: "Who is Cameron Diaz?" },
+      { q: "This is Taylor's childhood muse.", a: "Who are the Olsen Twins?" },
+      { q: "This song was Taylor's middle school anthem.", a: "What is “Bubbly” by Colbie Caillat?" },
+      { q: "This is Taylor's celebrity crush.", a: "Who is ___? (Host fills in!)" },
+      { q: "This is the reality TV show Taylor could binge forever.", a: "What is ___? (Host fills in!)" },
     ],
   },
 ];
@@ -427,17 +427,17 @@ function openClue(col, row, val, cell) {
   modalClue.textContent = cat.clues[row].q;
   answerContent.textContent = cat.clues[row].a;
   modalAnswer.classList.remove("show");
-  revealBtn.textContent = "Reveal Answer";
+  revealBtn.textContent = "Reveal Response";
   overlay.classList.add("show");
 }
 
 revealBtn.addEventListener("click", () => {
   if (modalAnswer.classList.contains("show")) {
     modalAnswer.classList.remove("show");
-    revealBtn.textContent = "Reveal Answer";
+    revealBtn.textContent = "Reveal Response";
   } else {
     modalAnswer.classList.add("show");
-    revealBtn.textContent = "Hide Answer";
+    revealBtn.textContent = "Hide Response";
   }
 });
 
